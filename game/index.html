@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple P5.js Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let scarecrow;
+        let interactionZones = [];
+
+        function preload() {
+            // Load the scarecrow image
+            scarecrow = loadImage('scarecrow.png');
+        }
+
+        function setup() {
+            // Create a 1000x1000 canvas and center it
+            let cnv = createCanvas(1000, 1000);
+            cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+            
+            // Define interaction zones for the scarecrow, tomatoes, cabbage, rake, and fence
+            interactionZones.push({name: 'scarecrow', x: 400, y: 300, w: 100, h: 200}); // Approximate position and size for scarecrow
+            interactionZones.push({name: 'tomatoes', x: 700, y: 700, w: 100, h: 100}); // Tomatoes
+            interactionZones.push({name: 'cabbage', x: 200, y: 600, w: 100, h: 100}); // Cabbage
+            interactionZones.push({name: 'rake', x: 500, y: 400, w: 50, h: 150}); // Rake
+            interactionZones.push({name: 'fence', x: 800, y: 100, w: 150, h: 500}); // Fence
+        }
+
+        function draw() {
+            // Draw the scarecrow image as the background
+            background(scarecrow);
+            
+            // Highlight interaction zones if mouse is over them
+            for (let zone of interactionZones) {
+                if (mouseX > zone.x && mouseX < zone.x + zone.w && mouseY > zone.y && mouseY < zone.y + zone.h) {
+                    fill(255, 0, 0, 100);
+                    rect(zone.x, zone.y, zone.w, zone.h);
+                    // Display the name of the zone in the center of the screen
+                    fill(0);
+                    textSize(48);
+                    textAlign(CENTER, CENTER);
+                    text(zone.name, width / 2, height / 2);
+                }
+            }
+
+            // Display the current mouse coordinates at the mouse position
+            displayCoordinates();
+        }
+
+        function mousePressed() {
+            // Check if mouse is in any interaction zone
+            for (let zone of interactionZones) {
+                if (mouseX > zone.x && mouseX < zone.x + zone.w && mouseY > zone.y && mouseY < zone.y + zone.h) {
+                    console.log('You interacted with the ' + zone.name);
+                }
+            }
+        }
+
+        function displayCoordinates() {
+            // Display the current mouse coordinates at the mouse position
+            fill(255);
+            textSize(32);
+            textAlign(LEFT, TOP);
+            text(`X: ${mouseX}, Y: ${mouseY}`, mouseX, mouseY);
+        }
+
+        // Make sure the canvas re-centers if the window is resized
+        function windowResized() {
+            resizeCanvas(1000, 1000);
+            let cnv = createCanvas(1000, 1000);
+            cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+        }
+    </script>
+</body>
+</html>

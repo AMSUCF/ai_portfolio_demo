@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Basic Fantasy Book Finder</title>
+    <style>
+       /* Global Styles */
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #2f2f2f; /* Dark gray background */
+            color: #d3d3d3; /* Light gray text */
+            margin: 0;
+            padding: 20px;
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); /* Subtle textured background */
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: #d3af37; /* Dark gold for headings */
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #f0e68c; /* Light gold */
+            font-family: 'Cinzel', serif;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #3f3f3f; /* Medium gray for contrast */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Book Container Styles */
+        .book-container {
+            background: #4f4f4f; /* Slightly lighter gray */
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid #5f5f5f; /* Dark gray border */
+        }
+
+        .book-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #d3af37; /* Dark gold */
+        }
+
+        .rating {
+            margin-top: 10px;
+            color: #f0e68c; /* Light gold */
+        }
+
+        /* Button Styles */
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #7b1fa2; /* Dark purple for a pop of color */
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4a148c; /* Darker purple on hover */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1>Our Basic Fantasy Book Finder</h1>
+        <div id="books"></div>
+        <div id="genre-preferences" style="margin-top: 20px;"></div>
+        <div id="book-recommendations" style="margin-top: 20px;"></div>
+        <div class="button-container">
+            <button id="more-books-button" onclick="loadMoreBooks()">Rate More Books</button>
+        </div>
+    </div>
+    
+    <script>
+        let genrePreferences = {};
+        let ratedBooks = new Set();
+        let allBooksData = [];
+
+        // Function to get 10 random books excluding already rated ones
+        function getRandomBooks(data, count = 10) {
+            const unratedBooks = data.filter(book => !ratedBooks.has(book.title));
+            const shuffled = unratedBooks.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // Function to create book rating elements
+        function createBookElements(books) {
+            const booksContainer = document.getElementById('books');
+            booksContainer.innerHTML = ''; // Clear existing books
+            books.forEach(book => {
+                ratedBooks.add(book.title);
+                const bookDiv = document.createElement('div');
+                bookDiv.className = 'book-container';
+
+                const title = document.createElement('div');
+                title.className = 'book-title';
+                title.textContent = `${book.title} by ${book.author} (${book.year}) - Genre: ${book.genre}`;
+
+                const ratingDiv = document.createElement('div');
+                ratingDiv.className = 'rating';
+
+                // Create rating radio buttons
+                for (let i = 1; i <= 5; i++) {
+                    const label = document.createElement('label');
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `rating-${book.title}`;
+                    radio.value = i;
+                    radio.addEventListener('change', () => handleRatingChange(book.genre, i));
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(` ${i} `));
+                    ratingDiv.appendChild(label);
+                }
+
+                // Create "Haven't read it" option
+                const haventReadLabel = document.createElement('label');
+                const haventReadRadio = document.createElement('input');
+                haventReadRadio.type = 'radio';
+                haventReadRadio.name = `rating-${book.title}`;
+                haventReadRadio.value = "haven't read";
+                haventReadRadio.addEventListener('change', () => handleRatingChange(book.genre, null));
+                haventReadLabel.appendChild(haventReadRadio);
+                haventReadLabel.appendChild(document.createTextNode(" Haven't read it "));
+                ratingDiv.appendChild(haventReadLabel);
+
+                bookDiv.appendChild(title);
+                bookDiv.appendChild(ratingDiv);
+                booksContainer.appendChild(bookDiv);
+            });
+        }
+
+        // Function to handle rating changes
+        function handleRatingChange(genre, rating) {
+            if (rating >= 3) {
+                if (genrePreferences[genre]) {
+                    genrePreferences[genre]++;
+                } else {
+                    genrePreferences[genre] = 1;
+                }
+            }
+            updateGenrePreferences();
+        }
+
+        // Function to update and display genre preferences
+        function updateGenrePreferences() {
+            const genrePreferencesDiv = document.getElementById('genre-preferences');
+            genrePreferencesDiv.innerHTML = '<h2>Genre Preferences (Rated 3 or Better)</h2>';
+            for (const genre in genrePreferences) {
+                const genreInfo = document.createElement('div');
+                genreInfo.textContent = `${genre}: ${genrePreferences[genre]} time(s)`;
+                genrePreferencesDiv.appendChild(genreInfo);
+            }
+            recommendBooks();
+        }
+
+        // Function to recommend books based on top genres
+        function recommendBooks() {
+            const topGenres = Object.entries(genrePreferences)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(entry => entry[0]);
+
+            const recommendations = [];
+            topGenres.forEach(genre => {
+                const genreBooks = allBooksData.filter(book => book.genre === genre && !ratedBooks.has(book.title));
+                if (genreBooks.length > 0) {
+                    recommendations.push(genreBooks[0]);
+                }
+            });
+
+            const bookRecommendationsDiv = document.getElementById('book-recommendations');
+            bookRecommendationsDiv.innerHTML = '<h2>Recommended Books for You</h2>';
+            recommendations.forEach(book => {
+                const bookInfo = document.createElement('div');
+                bookInfo.textContent = `${book.title} by ${book.author} (${book.year}) - Genre: ${book.genre}`;
+                bookRecommendationsDiv.appendChild(bookInfo);
+            });
+        }
+
+        // Function to load more books for rating
+        function loadMoreBooks() {
+            const moreBooks = getRandomBooks(allBooksData);
+            createBookElements(moreBooks);
+        }
+
+        // Fetch the JSON file and display 10 random books
+        fetch('fantasy_books.json')
+            .then(response => response.json())
+            .then(data => {
+                allBooksData = data;
+                const randomBooks = getRandomBooks(data);
+                createBookElements(randomBooks);
+            })
+            .catch(error => console.error('Error fetching the JSON file:', error));
+    </script>
+</body>
+</html>

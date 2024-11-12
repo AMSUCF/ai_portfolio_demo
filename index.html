@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header with image -->
+    <header class="header">
+        <img src="steampunk_ai_portfolio_header.jpg" alt="Steampunk AI Portfolio Header" class="header-image">
+        <h1 class="title">AI Experiments Portfolio</h1>
+        <nav class="menu">
+            <ul>
+                <li><a href="#textual">Textual AI</a></li>
+                <li><a href="#visual">Visual AI</a></li>
+                <li><a href="#procedural">Procedural AI</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main content sections -->
+    <main>
+        <!-- Textual AI Experiments with Cards -->
+            <section id="textual" class="section">
+                <h2>Textual AI Experiments</h2>
+                <p>Explore natural language processing, text generation, and language modeling projects.</p>
+
+                <div class="card-container">
+                    <!-- Distant Read Project Card -->
+                    <div class="card">
+                        <h3>Distant Reading Project</h3>
+                        <p>Analyze large-scale text corpora to uncover hidden patterns and insights. This project leverages distant reading techniques to process vast amounts of literary data.</p>
+                        <a href="#distant-read" class="card-link">Learn More</a>
+                    </div>
+
+                    <!-- Generative Short Story Project Card -->
+                    <div class="card">
+                        <h3>Generative Short Story</h3>
+                        <p>A creative experiment in AI-driven storytelling, producing unique short stories based on various prompts and narrative structures.</p>
+                        <a href="#generative-story" class="card-link">Read Story</a>
+                    </div>
+
+                    <!-- Bot Conversation Project Card -->
+                    <div class="card">
+                        <h3>Bot Conversation</h3>
+                        <p>Engage in real-time conversation with a chatbot designed to understand context and provide intelligent responses, pushing the boundaries of conversational AI.</p>
+                        <a href="#bot-conversation" class="card-link">Chat Now</a>
+                    </div>
+                </div>
+            </section>
+
+
+        <!-- Visual AI Experiments with Image Carousel -->
+        <section id="visual" class="section">
+            <h2>Visual AI Experiments</h2>
+            <p>Dive into computer vision, image generation, and visual analytics.</p>
+
+            <!-- Carousel Structure -->
+            <div class="carousel">
+                <div class="carousel-item active">
+                    <img src="image1.jpg" alt="Visual AI Image 1">
+                    <p class="caption">Caption for Image 1</p>
+                </div>
+                <div class="carousel-item">
+                    <img src="image2.jpg" alt="Visual AI Image 2">
+                    <p class="caption">Caption for Image 2</p>
+                </div>
+                <div class="carousel-item">
+                    <img src="image3.jpg" alt="Visual AI Image 3">
+                    <p class="caption">Caption for Image 3</p>
+                </div>
+                <div class="carousel-item">
+                    <img src="image4.jpg" alt="Visual AI Image 4">
+                    <p class="caption">Caption for Image 4</p>
+                </div>
+                <div class="carousel-item">
+                    <img src="image5.jpg" alt="Visual AI Image 5">
+                    <p class="caption">Caption for Image 5</p>
+                </div>
+                <!-- Carousel Controls -->
+                <button class="carousel-control prev" onclick="moveSlide(-1)">&#10094;</button>
+                <button class="carousel-control next" onclick="moveSlide(1)">&#10095;</button>
+            </div>
+        </section>
+
+        <!-- Procedural AI Experiments with Cards -->
+        <section id="procedural" class="section">
+            <h2>Procedural AI Experiments</h2>
+            <p>Discover algorithms, procedural content generation, and dynamic systems.</p>
+
+            <div class="card-container">
+                <!-- Book Recommendation System Card -->
+                <div class="card">
+                    <h3>Book Recommendation System</h3>
+                    <p>Explore a custom-built recommendation engine designed to suggest books based on your preferences and reading history.</p>
+                    <a href="recommendations/index.html" class="card-link">View Recommendations</a>
+                </div>
+
+                <!-- Game Project Card -->
+                <div class="card">
+                    <h3>Interactive Game</h3>
+                    <p>Dive into a procedural game with dynamic storytelling, generated environments, and engaging AI-driven gameplay.</p>
+                    <a href="game/index.html" class="card-link">Play Game</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 AI Portfolio</p>
+    </footer>
+
+    <script src="carousel.js"></script>
+</body>
+</html>

@@ -78,30 +78,38 @@
     }
 
     async function generateText() {
-        const startString = document.getElementById("user-input").value;
-        if (!startString || !model) return;
+    const startString = document.getElementById("user-input").value;
+    if (!startString || !model) return;
 
-        const temperature = 0.8;
-        const numGenerate = 500;
-        let inputIndices = startString.split('').map(char => char2idx[char] || 0);
-        let generatedText = startString;
+    const temperature = 0.8;
+    const numGenerate = 500;
+    let inputIndices = startString.split('').map(char => char2idx[char] || 0);
+    let generatedText = startString;
 
-        for (let i = 0; i < numGenerate; i++) {
-            const inputTensor = tf.tensor([inputIndices]);
-            const predictions = await model.predict(inputTensor).data();
-            const logits = predictions.slice(-1);
-            const scaledLogits = logits.map(logit => logit / temperature);
-            const nextCharIndex = tf.multinomial(scaledLogits, 1).dataSync()[0];
+    for (let i = 0; i < numGenerate; i++) {
+        const inputTensor = tf.tensor([inputIndices]);
 
-            const nextChar = idx2char[nextCharIndex] || ' ';
-            generatedText += nextChar;
+        // Use executeAsync instead of predict for models with dynamic ops
+        const predictions = await model.executeAsync(inputTensor);
+        const predictionsData = predictions.dataSync();  // Convert Tensor to array
 
-            inputIndices.push(nextCharIndex);
-            inputIndices = inputIndices.slice(1);
-        }
+        // Process logits with temperature
+        const logits = predictionsData.slice(-1);
+        const scaledLogits = logits.map(logit => logit / temperature);
+        const nextCharIndex = tf.multinomial(scaledLogits, 1).dataSync()[0];
 
-        document.getElementById("generated-text").innerText = generatedText;
+        const nextChar = idx2char[nextCharIndex] || ' ';
+        generatedText += nextChar;
+
+        inputIndices.push(nextCharIndex);
+        inputIndices = inputIndices.slice(1);  // Keep sequence length manageable
+
+        predictions.dispose(); // Free memory
     }
+
+    document.getElementById("generated-text").innerText = generatedText;
+}
+
 
     loadModel();
 </script>

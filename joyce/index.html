@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fiction with AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        #container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #generated-text {
+            margin: 20px 0;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h1>Interactive Fiction with AI</h1>
+    <p>Type a prompt to start your story, and let the AI continue it!</p>
+    <input type="text" id="user-input" placeholder="Enter your starting prompt here..." />
+    <button onclick="generateText()">Generate Story</button>
+    <div id="generated-text">Your story will appear here...</div>
+</div>
+
+<script>
+    let model;
+    const char2idx = {
+        ' ': 0, 'a': 1, 'b': 2, 'c': 3, /* Add all character mappings here */
+        // Replace this with the full character mapping used in training
+    };
+    const idx2char = Object.keys(char2idx).reduce((acc, char) => {
+        acc[char2idx[char]] = char;
+        return acc;
+    }, {});
+
+    async function loadModel() {
+        model = await tf.loadGraphModel('model.json');
+        document.getElementById("generated-text").innerText = "Model loaded! Type a prompt to start your story.";
+    }
+
+    async function generateText() {
+        const startString = document.getElementById("user-input").value;
+        if (!startString || !model) return;
+
+        const temperature = 0.8;
+        const numGenerate = 500;
+        let inputIndices = startString.split('').map(char => char2idx[char] || 0);
+        let generatedText = startString;
+
+        for (let i = 0; i < numGenerate; i++) {
+            const inputTensor = tf.tensor([inputIndices]);
+            const predictions = await model.predict(inputTensor).data();
+            const logits = predictions.slice(-1);
+            const scaledLogits = logits.map(logit => logit / temperature);
+            const nextCharIndex = tf.multinomial(scaledLogits, 1).dataSync()[0];
+
+            const nextChar = idx2char[nextCharIndex] || ' ';
+            generatedText += nextChar;
+
+            inputIndices.push(nextCharIndex);
+            inputIndices = inputIndices.slice(1);
+        }
+
+        document.getElementById("generated-text").innerText = generatedText;
+    }
+
+    loadModel();
+</script>
+
+</body>
+</html>
